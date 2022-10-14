@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32922.545
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StellarClassification", "StellarClassification\StellarClassification.csproj", "{420299D3-7FB7-4E55-ACE3-CED42B2687FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{420299D3-7FB7-4E55-ACE3-CED42B2687FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{420299D3-7FB7-4E55-ACE3-CED42B2687FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{420299D3-7FB7-4E55-ACE3-CED42B2687FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{420299D3-7FB7-4E55-ACE3-CED42B2687FD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {51C97022-8388-46AD-86BD-9D3D2362CA29}
+	EndGlobalSection
+EndGlobal
