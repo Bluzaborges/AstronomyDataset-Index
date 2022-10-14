@@ -121,6 +121,7 @@ public static class Program
 
         int Id = int.Parse(Console.ReadLine());
 
+        Console.Write("Digite o id: ");
         var header = reader.ReadString();
 
         if (BinarySearch(reader, Id, 0, reader.BaseStream.Length / TamanhoRegistro - 1, TamanhoRegistro) == -1)
