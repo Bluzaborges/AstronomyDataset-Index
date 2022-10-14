@@ -1,5 +1,28 @@
 ﻿namespace StellarClassification;
 
+public struct Dados
+{
+    public int Id { get; set; }
+    public string Alpha { get; set; }
+    public string Delta { get; set; }
+    public string U { get; set; }
+    public string G { get; set; }
+    public string R { get; set; }
+    public string I { get; set; }
+    public string Z { get; set; }
+    public string Run_id { get; set; }
+    public string Rerun_id { get; set; }
+    public string Cam_col { get; set; }
+    public string Field_id { get; set; }
+    public string Spec_obj_id { get; set; }
+    public string Class { get; set; }
+    public string Redshift { get; set; }
+    public string Plate { get; set; }
+    public string MJD { get; set; }
+    public string Fiber_id { get; set; }
+
+}
+
 public static class Program
 {
     public static void Main(string[] args)
@@ -33,6 +56,7 @@ public static class Program
 
         while (!reader.EndOfStream)
         {
+
             Console.WriteLine(reader.ReadLine());
         }
     }
