@@ -7,4 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /i /e /s /y /f &quot;$(SolutionDir)\files\*&quot; &quot;$(OutDir)\files&quot;" />
+  </Target>
+
 </Project>

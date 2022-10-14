@@ -33,7 +33,7 @@ public static class Program
     private static void AssembleFile()
     {
         var list = new List<string[]>();
-        using var stream = new StreamReader("C:\\Users\\mohrdi\\Downloads\\archive (2)\\star_classification.csv");
+        using var stream = new StreamReader("files\\star_classification.csv");
         var header = stream.ReadLine();
         header = header.Replace("obj_ID", "id");
         while (!stream.EndOfStream)
@@ -43,7 +43,7 @@ public static class Program
             list.Add(values);
         }
 
-        using var writer = new StreamWriter("C:\\Users\\mohrdi\\Downloads\\archive (2)\\star_classification_mod.csv");
+        using var writer = new StreamWriter("files\\star_classification_mod.csv");
         writer.WriteLine(header);
         for (int i = 0; i < list.Count; i++)
             writer.WriteLine($"{i},{string.Join(',', list[i])}");
@@ -51,7 +51,7 @@ public static class Program
 
     private static void ShowData()
     {
-        using var reader = new StreamReader("C:\\Users\\mohrdi\\Downloads\\archive (2)\\star_classification_mod.csv");
+        using var reader = new StreamReader("files\\star_classification.csv");
         var header = reader.ReadLine();
 
         while (!reader.EndOfStream)
