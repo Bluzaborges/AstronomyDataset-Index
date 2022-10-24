@@ -6,18 +6,18 @@ using System.Threading.Tasks;
 
 namespace StellarClassification
 {
-    public class LinkedListIndex
+    public class ListIndex
     {
         public string Tipo { get; set; }
         public List<int> lstId = new List<int>();
 
-        public LinkedListIndex(Data strcData)
+        public ListIndex(Data strcData)
         {
             this.Tipo = strcData.Class;
             this.lstId.Add(strcData.Id);
         }
 
-        public static void carregaDados(List<LinkedListIndex> lstId)
+        public static void carregaDados(List<ListIndex> lstId)
         {
             using var binaryStream = File.Open("files\\star_classification.dat", FileMode.Open);
             using var reader = new BinaryReader(binaryStream);
@@ -40,7 +40,7 @@ namespace StellarClassification
                 }
                 else
                 {
-                    lstId.Add(new LinkedListIndex(data));
+                    lstId.Add(new ListIndex(data));
                 }
 
             }

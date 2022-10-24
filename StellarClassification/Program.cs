@@ -38,8 +38,8 @@ public static class Program
         int redshiftIndexRegisterSize = RedshiftIndex(dataRegisterSize);
         int alphaIndexRegisterSize = AlphaIndex(dataRegisterSize);
 
-        List<LinkedListIndex> classIndex = new List<LinkedListIndex>();
-        LinkedListIndex.carregaDados(classIndex);
+        List<ListIndex> classIndex = new List<ListIndex>();
+        ListIndex.carregaDados(classIndex);
 
         while (option != 8)
         {
@@ -68,7 +68,13 @@ public static class Program
                     SearchForAlphaValue(alphaIndexRegisterSize, dataRegisterSize);
                     break;
                 case 7:
-                    ShowDataByClass(classIndex, dataRegisterSize);
+                    ShowDataByClassMenu(classIndex, dataRegisterSize);
+                    break;
+                default:
+                    Console.WriteLine("Digite uma das opções acima.");
+                    Console.WriteLine("Aperte qualquer tecla para continuar");
+                    Console.ReadLine();
+                    Console.Clear();
                     break;
             }
         }
@@ -198,18 +204,104 @@ public static class Program
         return sizeOfRegister + 1;
     }
 
-    private static void ShowDataByClass(List<LinkedListIndex> classIndex, int dataRegisterSize)
+    private static void ShowDataByClassMenu(List<ListIndex> classIndex, int dataRegisterSize)
     {
         Console.Clear();
-        Console.WriteLine("-------------------------------------------");
-        Console.WriteLine("1. Mostrar todas as estrelas.");
-        Console.WriteLine("2. Mostrar todas as galáxias.");
-        Console.WriteLine("3. Mostrar todos os quasares.");
-        Console.WriteLine("4. Mostrar estrela aleatória.");
-        Console.WriteLine("5. Mostrar galáxia aleatória.");
-        Console.WriteLine("6. Mostrar quasar aleatório.");
-        Console.WriteLine("7. Voltar.");
-        Console.WriteLine("-------------------------------------------");
+
+        int option = 0;
+        using var dataBinaryStream = File.Open("files\\star_classification.dat", FileMode.Open);
+        using var dataReader = new BinaryReader(dataBinaryStream);
+
+        while (option != 7)
+        {
+            Console.WriteLine("-------------------------------------------");
+            Console.WriteLine("1. Mostrar todas as estrelas.");
+            Console.WriteLine("2. Mostrar todas as galáxias.");
+            Console.WriteLine("3. Mostrar todos os quasares.");
+            Console.WriteLine("4. Mostrar estrela aleatória.");
+            Console.WriteLine("5. Mostrar galáxia aleatória.");
+            Console.WriteLine("6. Mostrar quasar aleatório.");
+            Console.WriteLine("7. Voltar.");
+            Console.WriteLine("-------------------------------------------");
+
+            Console.Write("Digite a opção: ");
+            option = int.Parse(Console.ReadLine());
+
+            switch (option)
+            {
+                case 1:
+                    ShowDataByClass(classIndex, dataRegisterSize, "STAR", dataReader);
+                    break;
+                case 2:
+                    ShowDataByClass(classIndex, dataRegisterSize, "GALAXY", dataReader);
+                    break;
+                case 3:
+                    ShowDataByClass(classIndex, dataRegisterSize, "QSO", dataReader);
+                    break;
+                case 4:
+                    RandomRegisterByClass(classIndex, dataRegisterSize, "STAR", dataReader);
+                    break;
+                case 5:
+                    RandomRegisterByClass(classIndex, dataRegisterSize, "GALAXY", dataReader);
+                    break;
+                case 6:
+                    RandomRegisterByClass(classIndex, dataRegisterSize, "QSO", dataReader);
+                    break;
+                default:
+                    Console.WriteLine("Digite uma das opções acima.");
+                    Console.WriteLine("Aperte qualquer tecla para continuar");
+                    Console.ReadLine();
+                    Console.Clear();
+                    break;
+            }
+        }
+
+        Console.Clear();
+    }
+
+    private static void ShowDataByClass(List<ListIndex> classIndex, int dataRegisterSize, string Class, BinaryReader reader)
+    {
+
+        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+        Console.WriteLine("   ID            CLASSE         REDSHIFT                    MJD      ALPHA             DELTA");
+
+        for (int i = 0; i < classIndex.Count; i++)
+        {
+            if (classIndex[i].Tipo.Equals(Class))
+            {
+                for (int j = 0; j < classIndex[i].lstId.Count; j++)
+                {
+                    reader.BaseStream.Seek(classIndex[i].lstId[j] * dataRegisterSize, SeekOrigin.Begin);
+                    var line = reader.ReadString();
+                    var values = line.Split(',').Skip(0).ToArray();
+                    Console.WriteLine($"{classIndex[i].lstId[j].ToString().PadLeft(5)}{values[13]}{values[14]}{values[16]}{values[1]}{values[2]}");
+                }
+            }
+        }
+
+        Console.WriteLine("Aperte qualquer tecla para continuar");
+        Console.ReadLine();
+        Console.Clear();
+    }
+
+    private static void RandomRegisterByClass(List<ListIndex> classIndex, int dataRegisterSize, string Class, BinaryReader reader)
+    {
+        for (int i = 0; i < classIndex.Count; i++)
+        {
+            if (classIndex[i].Tipo.Equals(Class))
+            {
+                Random randomNumber = new Random();
+                int randomPosition = randomNumber.Next(0, classIndex[i].lstId.Count);
+                reader.BaseStream.Seek(classIndex[i].lstId[randomPosition] * dataRegisterSize, SeekOrigin.Begin);
+                var line = reader.ReadString();
+                var values = line.Split(',').Skip(0).ToArray();
+                WriteRegister(classIndex[i].lstId[randomPosition], values[13], values[14], values[16], values[1], values[2]);
+            }
+        }
+
+        Console.WriteLine("Aperte qualquer tecla para continuar");
+        Console.ReadLine();
+        Console.Clear();
     }
 
     private static void AssembleFile()
@@ -546,7 +638,7 @@ public static class Program
         Console.WriteLine("4. Pesquisar por valor de redshift.");
         Console.WriteLine("5. Mostrar indice de alpha");
         Console.WriteLine("6. Pesquisar por valor de alpha");
-        Console.WriteLine("7. Pesquisar objeto por classe (não implementado ainda)");
+        Console.WriteLine("7. Pesquisar objeto por classe");
         Console.WriteLine("8. Sair.");
         Console.WriteLine("-------------------------------------------");
     }
