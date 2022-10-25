@@ -41,7 +41,7 @@ public static class Program
         List<ListIndex> classIndex = new List<ListIndex>();
         ListIndex.carregaDados(classIndex);
 
-        while (option != 8)
+        while (option != 11)
         {
             Menu();
             Console.Write("Digite a opção: ");
@@ -69,6 +69,17 @@ public static class Program
                     break;
                 case 7:
                     ShowDataByClassMenu(classIndex, dataRegisterSize);
+                    break;
+                case 8:
+                    ObjectsWithMotionAway(dataRegisterSize);
+                    break;
+                case 9:
+                    ObjectsWithMotionTowards(dataRegisterSize);
+                    break;
+                case 10:
+                    ObjectWithHighRelativityVelocity(dataRegisterSize);
+                    break;
+                case 11:
                     break;
                 default:
                     Console.WriteLine("Digite uma das opções acima.");
@@ -212,7 +223,7 @@ public static class Program
         using var dataBinaryStream = File.Open("files\\star_classification.dat", FileMode.Open);
         using var dataReader = new BinaryReader(dataBinaryStream);
 
-        while (option != 7)
+        while (option != 8)
         {
             Console.WriteLine("-------------------------------------------");
             Console.WriteLine("1. Mostrar todas as estrelas.");
@@ -221,7 +232,8 @@ public static class Program
             Console.WriteLine("4. Mostrar estrela aleatória.");
             Console.WriteLine("5. Mostrar galáxia aleatória.");
             Console.WriteLine("6. Mostrar quasar aleatório.");
-            Console.WriteLine("7. Voltar.");
+            Console.WriteLine("7. Mostrar contagem por classe.");
+            Console.WriteLine("8. Voltar.");
             Console.WriteLine("-------------------------------------------");
 
             Console.Write("Digite a opção: ");
@@ -246,6 +258,11 @@ public static class Program
                     break;
                 case 6:
                     RandomRegisterByClass(classIndex, dataRegisterSize, "QSO", dataReader);
+                    break;
+                case 7:
+                    CountRegisterByClass(classIndex);
+                    break;
+                case 8:
                     break;
                 default:
                     Console.WriteLine("Digite uma das opções acima.");
@@ -300,6 +317,15 @@ public static class Program
         }
 
         Console.WriteLine("Aperte qualquer tecla para continuar");
+        Console.ReadLine();
+        Console.Clear();
+    }
+
+    private static void CountRegisterByClass(List<ListIndex> lstclassIndex)
+    {
+        lstclassIndex.ForEach(x => Console.WriteLine(String.Concat("\r\n", x.Tipo, " possui ", x.lstId.Count, " registros.")));
+
+        Console.WriteLine(String.Concat("\r\n", "Aperte qualquer tecla para continuar"));
         Console.ReadLine();
         Console.Clear();
     }
@@ -402,6 +428,8 @@ public static class Program
             var line = reader.ReadString();
             var values = line.Split(';').Skip(0).ToArray();
 
+            decimal redshift = decimal.Parse(values[1]);
+
             Console.WriteLine($"{values[0].PadLeft(6)}{values[1]}");
         }
 
@@ -486,6 +514,123 @@ public static class Program
             Console.WriteLine("Valor nao encontrado");
         }
 
+        Console.WriteLine("Aperte qualquer tecla para continuar");
+        Console.ReadLine();
+        Console.Clear();
+    }
+
+    private static void ObjectsWithMotionAway(int dataRegisterSize)
+    {
+        using var binaryStream = File.Open("files\\red_shift_index.dat", FileMode.Open);
+        using var indexReader = new BinaryReader(binaryStream);
+        using var dataBinaryStream = File.Open("files\\star_classification.dat", FileMode.Open);
+        using var dataReader = new BinaryReader(dataBinaryStream);
+
+        int count = 0;
+
+        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+        Console.WriteLine("   ID            CLASSE         REDSHIFT                    MJD      ALPHA             DELTA");
+
+        while (indexReader.BaseStream.Position != indexReader.BaseStream.Length)
+        {
+            var line = indexReader.ReadString();
+            var indexValues = line.Split(';').Skip(0).ToArray();
+
+            decimal redshift = decimal.Parse(indexValues[1]);
+            int id = int.Parse(indexValues[0]);
+
+            if (redshift > 0)
+            {
+                dataReader.BaseStream.Seek(id * dataRegisterSize, SeekOrigin.Begin);
+                line = dataReader.ReadString();
+                var dataValues = line.Split(',').Skip(0).ToArray();
+                Console.WriteLine($"{id.ToString().PadLeft(5)}{dataValues[13]}{dataValues[14]}{dataValues[16]}{dataValues[1]}{dataValues[2]}");
+                count++;
+            }
+
+        }
+        Console.WriteLine($"Quantidade de objetos: {count}");
+        Console.WriteLine("------------------------------");
+        Console.WriteLine("Aperte qualquer tecla para continuar");
+        Console.ReadLine();
+        Console.Clear();
+    }
+
+    private static void ObjectsWithMotionTowards(int dataRegisterSize)
+    {
+        using var binaryStream = File.Open("files\\red_shift_index.dat", FileMode.Open);
+        using var indexReader = new BinaryReader(binaryStream);
+        using var dataBinaryStream = File.Open("files\\star_classification.dat", FileMode.Open);
+        using var dataReader = new BinaryReader(dataBinaryStream);
+
+        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+        Console.WriteLine("   ID            CLASSE         REDSHIFT                    MJD      ALPHA             DELTA");
+
+        int count = 0;
+
+        while (indexReader.BaseStream.Position != indexReader.BaseStream.Length)
+        {
+            var line = indexReader.ReadString();
+            var indexValues = line.Split(';').Skip(0).ToArray();
+
+            decimal redshift = decimal.Parse(indexValues[1]);
+            int id = int.Parse(indexValues[0]);
+
+            if (redshift < 0)
+            {
+                dataReader.BaseStream.Seek(id * dataRegisterSize, SeekOrigin.Begin);
+                line = dataReader.ReadString();
+                var dataValues = line.Split(',').Skip(0).ToArray();
+                Console.WriteLine($"{id.ToString().PadLeft(5)}{dataValues[13]}{dataValues[14]}{dataValues[16]}{dataValues[1]}{dataValues[2]}");
+                count++;
+            }
+
+        }
+        Console.WriteLine($"Quantidade de objetos: {count}");
+        Console.WriteLine("------------------------------");
+        Console.WriteLine("Aperte qualquer tecla para continuar");
+        Console.ReadLine();
+        Console.Clear();
+    }
+
+    private static void ObjectWithHighRelativityVelocity(int dataRegisterSize)
+    {
+        using var binaryStream = File.Open("files\\red_shift_index.dat", FileMode.Open);
+        using var indexReader = new BinaryReader(binaryStream);
+        using var dataBinaryStream = File.Open("files\\star_classification.dat", FileMode.Open);
+        using var dataReader = new BinaryReader(dataBinaryStream);
+
+        decimal highVelocity = 0;
+        int idWithHighVelocity = 0;
+        decimal velocity;
+        decimal lighVelocity = 300000;
+
+        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+        Console.WriteLine("   ID               CLASSE           REDSHIFT         VELOCIDADE RELATIVA");
+
+        while (indexReader.BaseStream.Position != indexReader.BaseStream.Length)
+        {
+            var line = indexReader.ReadString();
+            var indexValues = line.Split(';').Skip(0).ToArray();
+
+            decimal redshift = decimal.Parse(indexValues[1]);
+            int id = int.Parse(indexValues[0]);
+
+            //Font: https://sites.uni.edu/morgans/astro/course/Notes/section3/math13.html
+            velocity = Math.Abs((((redshift + 1) * (redshift + 1) - 1) / ((redshift + 1) * (redshift + 1) + 1)) * lighVelocity);
+
+            if (velocity > highVelocity)
+            {
+                highVelocity = velocity;
+                idWithHighVelocity = id;
+            }
+        }
+
+        dataReader.BaseStream.Seek(idWithHighVelocity * dataRegisterSize, SeekOrigin.Begin);
+        var dataLine = dataReader.ReadString();
+        var dataValues = dataLine.Split(',').Skip(0).ToArray();
+        Console.WriteLine($"{idWithHighVelocity.ToString().PadLeft(5)}{dataValues[13]}{dataValues[14]}{Math.Round(highVelocity, 2).ToString().PadLeft(18)}");
+        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
         Console.WriteLine("Aperte qualquer tecla para continuar");
         Console.ReadLine();
         Console.Clear();
@@ -639,7 +784,10 @@ public static class Program
         Console.WriteLine("5. Mostrar indice de alpha");
         Console.WriteLine("6. Pesquisar por valor de alpha");
         Console.WriteLine("7. Pesquisar objeto por classe");
-        Console.WriteLine("8. Sair.");
+        Console.WriteLine("8. Quais objetos estão se afastando de nós?");
+        Console.WriteLine("9. Quais objetos estão se aproximando de nós?");
+        Console.WriteLine("10. Qual objeto tem maior velocidade relativa?");
+        Console.WriteLine("11. Sair.");
         Console.WriteLine("-------------------------------------------");
     }
 }
