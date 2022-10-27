@@ -41,7 +41,10 @@ public static class Program
         List<ListIndex> classIndex = new List<ListIndex>();
         ListIndex.carregaDados(classIndex);
 
-        while (option != 11)
+        TreeIndex treeIndex = new TreeIndex();
+        TreeIndex.LoadData(treeIndex);
+
+        while (option != 15)
         {
             Menu();
             Console.Write("Digite a opção: ");
@@ -71,15 +74,27 @@ public static class Program
                     ShowDataByClassMenu(classIndex, dataRegisterSize);
                     break;
                 case 8:
-                    ObjectsWithMotionAway(dataRegisterSize);
+                    ShowDataByDate(treeIndex);
                     break;
                 case 9:
-                    ObjectsWithMotionTowards(dataRegisterSize);
+                    SearchByDate(treeIndex, dataRegisterSize);
                     break;
                 case 10:
-                    ObjectWithHighRelativityVelocity(dataRegisterSize);
+                    ObjectWithMostOlderDate(treeIndex, dataRegisterSize);
                     break;
                 case 11:
+                    ObjectWithMostRecentlyDate(treeIndex, dataRegisterSize);
+                    break;
+                case 12:
+                    ObjectsWithMotionAway(dataRegisterSize);
+                    break;
+                case 13:
+                    ObjectsWithMotionTowards(dataRegisterSize);
+                    break;
+                case 14:
+                    ObjectWithHighRelativityVelocity(dataRegisterSize);
+                    break;
+                case 15:
                     break;
                 default:
                     Console.WriteLine("Digite uma das opções acima.");
@@ -519,6 +534,92 @@ public static class Program
         Console.Clear();
     }
 
+    private static void ShowDataByDate(TreeIndex treeIndex)
+    {
+        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+        Console.WriteLine("    ID     DATA");
+
+        treeIndex.InOrder(treeIndex.root);
+
+        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+
+        Console.WriteLine("Aperte qualquer tecla para continuar");
+        Console.ReadLine();
+        Console.Clear();
+    }
+
+    private static void SearchByDate(TreeIndex treeIndex, int dataRegisterSize)
+    {
+        using var binaryStream = File.Open("files\\star_classification.dat", FileMode.Open);
+        using var reader = new BinaryReader(binaryStream);
+
+        Console.Write("Digite a data desejada: ");
+        DateTime date = DateTime.Parse(Console.ReadLine());
+
+        double mjd = (date.ToOADate() + 2415018.5) - 2400000.5;
+
+        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+        Console.WriteLine("   ID            CLASSE         REDSHIFT                    MJD      ALPHA             DELTA");
+
+        treeIndex.SearchByDate(treeIndex.root, mjd, reader, dataRegisterSize);
+
+        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+
+        Console.WriteLine("Aperte qualquer tecla para continuar");
+        Console.ReadLine();
+        Console.Clear();
+    }
+
+    private static void ObjectWithMostRecentlyDate(TreeIndex treeIndex, int dataRegisterSize)
+    {
+        using var binaryStream = File.Open("files\\star_classification.dat", FileMode.Open);
+        using var reader = new BinaryReader(binaryStream);
+
+        Node node = treeIndex.MaxMjdValue(treeIndex.root);
+
+        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+        Console.WriteLine("   ID            CLASSE         REDSHIFT                    MJD      ALPHA             DELTA");
+
+        for (int i = 0; i < node.Id.Count; i++)
+        {
+            reader.BaseStream.Seek(node.Id[i] * dataRegisterSize, SeekOrigin.Begin);
+            var line = reader.ReadString();
+            var values = line.Split(',').Skip(0).ToArray();
+            Console.WriteLine($"{node.Id[i].ToString().PadLeft(5)}{values[13]}{values[14]}{values[16]}{values[1]}{values[2]}");
+        }
+
+        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+
+        Console.WriteLine("Aperte qualquer tecla para continuar");
+        Console.ReadLine();
+        Console.Clear();
+    }
+
+    private static void ObjectWithMostOlderDate(TreeIndex treeIndex, int dataRegisterSize)
+    {
+        using var binaryStream = File.Open("files\\star_classification.dat", FileMode.Open);
+        using var reader = new BinaryReader(binaryStream);
+
+        Node node = treeIndex.MinMjdValue(treeIndex.root);
+
+        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+        Console.WriteLine("   ID            CLASSE         REDSHIFT                    MJD      ALPHA             DELTA");
+
+        for (int i = 0; i < node.Id.Count; i++)
+        {
+            reader.BaseStream.Seek(node.Id[i] * dataRegisterSize, SeekOrigin.Begin);
+            var line = reader.ReadString();
+            var values = line.Split(',').Skip(0).ToArray();
+            Console.WriteLine($"{node.Id[i].ToString().PadLeft(5)}{values[13]}{values[14]}{values[16]}{values[1]}{values[2]}");
+        }
+
+        Console.WriteLine("---------------------------------------------------------------------------------------------------------");
+
+        Console.WriteLine("Aperte qualquer tecla para continuar");
+        Console.ReadLine();
+        Console.Clear();
+    }
+
     private static void ObjectsWithMotionAway(int dataRegisterSize)
     {
         using var binaryStream = File.Open("files\\red_shift_index.dat", FileMode.Open);
@@ -784,10 +885,14 @@ public static class Program
         Console.WriteLine("5. Mostrar indice de alpha");
         Console.WriteLine("6. Pesquisar por valor de alpha");
         Console.WriteLine("7. Pesquisar objeto por classe");
-        Console.WriteLine("8. Quais objetos estão se afastando de nós?");
-        Console.WriteLine("9. Quais objetos estão se aproximando de nós?");
-        Console.WriteLine("10. Qual objeto tem maior velocidade relativa?");
-        Console.WriteLine("11. Sair.");
+        Console.WriteLine("8. Índice ordenado por data");
+        Console.WriteLine("9. Pesquisar por data");
+        Console.WriteLine("10. Objeto registrado com data mais antiga");
+        Console.WriteLine("11. Objeto registrado com data mais recente");
+        Console.WriteLine("12. Quais objetos estão se afastando de nós?");
+        Console.WriteLine("13. Quais objetos estão se aproximando de nós?");
+        Console.WriteLine("14. Qual objeto tem maior velocidade relativa?");
+        Console.WriteLine("15. Sair.");
         Console.WriteLine("-------------------------------------------");
     }
 }

@@ -19,6 +19,8 @@ namespace StellarClassification
 
         public static void carregaDados(List<ListIndex> lstId)
         {
+            Console.WriteLine("Criando índice do campo classe...");
+
             using var binaryStream = File.Open("files\\star_classification.dat", FileMode.Open);
             using var reader = new BinaryReader(binaryStream);
 
@@ -44,6 +46,9 @@ namespace StellarClassification
                 }
 
             }
+
+            Console.WriteLine("Índice de classe criado com sucesso.");
+            Console.Clear();
         }
     }
 }
